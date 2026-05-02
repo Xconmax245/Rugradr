@@ -62,12 +62,13 @@ module.exports = async (address, total_supply) => {
 
     return {
       deployerAddress: truncate(deployer),
+      deployerRaw: deployer,
       percentSold: Math.round(percentSold),
       recentTxCount,
       scoreImpact
     };
   } catch (err) {
     console.error('[checkDevWallet] Error:', err.message);
-    return { deployerAddress: "Unknown", percentSold: 0, recentTxCount: 0, scoreImpact: 0 };
+    return { deployerAddress: "Unknown", deployerRaw: null, percentSold: 0, recentTxCount: 0, scoreImpact: 0 };
   }
 };

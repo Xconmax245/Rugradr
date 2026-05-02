@@ -1,10 +1,26 @@
-const analyzeToken = require('../services/analyzeToken');
+const { analyzeFull } = require('../services/analyzeToken');
 const formatReport = require('../utils/formatReport');
 const { COOLDOWN_MS } = require('../config/constants');
 
-const cooldowns = new Map();
+const loadingMessages = [
+  "🕵️ Sniffing the blockchain...",
+  "🔬 Putting this token under the microscope...",
+  "🚨 Checking if this dev is cooked...",
+  "🧪 Running tests on this sketchy little token...",
+  "👀 Looking for red flags... found some already.",
+  "🏃 Chasing the deployer wallet across the chain...",
+  "📡 Pinging DexScreener, Helius and the vibes...",
+  "🔎 Give me a sec, this smells suspicious...",
+  "⛓️ Reading the chain like a book...",
+  "🤔 Either this is fine or we're both about to learn a lesson...",
+  "🧅 Peeling back the layers on this one...",
+  "💀 Checking if this is already dead...",
+  "🎰 Let's see what we're working with...",
+  "🐀 Rat detection in progress...",
+  "🔦 Shining a light on this token...",
+];
 
-module.exports = (bot) => {
+module.exports = (bot, cooldowns) => {
   bot.command('check', async (ctx) => {
     try {
       const userId = ctx.from.id;
@@ -16,47 +32,30 @@ module.exports = (bot) => {
         return await ctx.reply(`⏳ Please wait ${remaining}s before checking another token.`);
       }
       
-      cooldowns.set(userId, now);
-
       const args = ctx.message.text.split(' ');
       const address = args[1];
       const solanaRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 
       if (!address) {
-        return await ctx.replyWithHTML(`👇 To scan a token, send me its contract address like this:
-
-<code>/check EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v</code>
-
-You can find contract addresses on Dexscreener, pump.fun, or in the token's Telegram group.`);
+        return await ctx.replyWithHTML(`👇 To scan a token, send me its contract address like this:\n\n<code>/check EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v</code>\n\nYou can also just paste the address directly!`);
       }
 
       if (!solanaRegex.test(address)) {
-        return await ctx.replyWithHTML(`❌ That doesn't look like a valid Solana contract address.
-
-A Solana address looks like this:
-<code>EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v</code>
-
-Make sure you're copying the contract address — not the token name or ticker symbol.`);
+        return await ctx.replyWithHTML(`❌ That doesn't look like a valid Solana contract address.\n\nA Solana address looks like this:\n<code>EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v</code>`);
       }
 
-      await ctx.replyWithHTML(`🔍 Scanning token...
-⏳ Pulling market data + running 6 security checks.
-Takes about 5–10 seconds.`);
+      cooldowns.set(userId, now);
 
-      const result = await analyzeToken(address);
+      const randomLoading = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
+      await ctx.replyWithHTML(randomLoading);
+
+      const result = await analyzeFull(address);
       const report = formatReport(result, address);
 
       await ctx.replyWithHTML(report);
     } catch (err) {
       console.error('Error in /check command:', err);
-      await ctx.replyWithHTML(`😕 Something went wrong while scanning that token.
-
-This can happen if:
-• The token is brand new and has no data yet
-• The contract address is incorrect
-• Our data provider is temporarily slow
-
-Please try again in a moment.`);
+      await ctx.replyWithHTML(`😕 Something went wrong while scanning that token.`);
     }
   });
 };

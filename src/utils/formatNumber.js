@@ -1,16 +1,30 @@
 /**
- * Format price — handles very small numbers like 0.000001281
+ * Format price — handles very small numbers with subscript zeros
  * @param {string|number} price 
  * @returns {string} Formatted price string.
  */
 const formatPrice = (price) => {
   if (!price) return 'N/A';
   const num = parseFloat(price);
-  if (num < 0.000001) return `$0.0₆${(num * 1e7).toFixed(1)}`;
-  if (num < 0.00001) return `$0.0₅${(num * 1e6).toFixed(2)}`; // shows subscript zeros
-  if (num < 0.001) return `$${num.toFixed(6)}`;
-  if (num < 1) return `$${num.toFixed(4)}`;
-  return `$${num.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+  if (isNaN(num) || num === 0) return 'N/A';
+
+  if (num >= 1) return `$${num.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+  if (num >= 0.01) return `$${num.toFixed(4)}`;
+  if (num >= 0.0001) return `$${num.toFixed(6)}`;
+
+  // Count leading zeros after decimal point
+  const str = num.toFixed(12); // Use higher precision for zero counting
+  const match = str.match(/^0\.(0+)([1-9]\d*)/);
+  if (!match) return `$${num.toFixed(8)}`;
+
+  const zeros = match[1].length;
+  const significant = match[2].slice(0, 4);
+
+  // Convert zero count to subscript
+  const subscripts = { '1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉','0':'₀' };
+  const sub = String(zeros).split('').map(d => subscripts[d] || d).join('');
+
+  return `$0.0${sub}${significant}`;
 };
 
 /**

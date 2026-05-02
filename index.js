@@ -5,6 +5,12 @@ const startCommand = require('./src/commands/start');
 const helpCommand = require('./src/commands/help');
 const checkCommand = require('./src/commands/check');
 const guideCommand = require('./src/commands/guide');
+const { analyzeFull } = require('./src/services/analyzeToken');
+const formatReport = require('./src/utils/formatReport');
+const { COOLDOWN_MS } = require('./src/config/constants');
+
+// Cooldown tracker
+const cooldowns = new Map();
 
 // Global error handlers
 process.on('unhandledRejection', (reason, promise) => {
@@ -52,8 +58,75 @@ async function startBot() {
     // Register commands
     startCommand(bot);
     helpCommand(bot);
-    checkCommand(bot);
+    checkCommand(bot, cooldowns);
     guideCommand(bot);
+
+    // Rotating loading messages
+    const loadingMessages = [
+      "🕵️ Sniffing the blockchain...",
+      "🔬 Putting this token under the microscope...",
+      "🚨 Checking if this dev is cooked...",
+      "🧪 Running tests on this sketchy little token...",
+      "👀 Looking for red flags... found some already.",
+      "🏃 Chasing the deployer wallet across the chain...",
+      "📡 Pinging DexScreener, Helius and the vibes...",
+      "🔎 Give me a sec, this smells suspicious...",
+      "⛓️ Reading the chain like a book...",
+      "🤔 Either this is fine or we're both about to learn a lesson...",
+      "🧅 Peeling back the layers on this one...",
+      "💀 Checking if this is already dead...",
+      "🎰 Let's see what we're working with...",
+      "🐀 Rat detection in progress...",
+      "🔦 Shining a light on this token...",
+    ];
+
+    // Direct CA Paste handler
+    bot.on('text', async (ctx) => {
+      const text = ctx.message.text.trim();
+      
+      // Ignore messages that start with /
+      if (text.startsWith('/')) return;
+
+      const solanaRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+      if (!solanaRegex.test(text)) {
+        return await ctx.replyWithHTML(
+          `🤔 That doesn't look like a Solana contract address.\n\n` +
+          `Just paste a contract address directly — no commands needed.\n\n` +
+          `Example:\n<code>EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v</code>`
+        );
+      }
+
+      // Valid CA — run the analysis
+      const userId = ctx.from.id;
+      const now = Date.now();
+      const lastUsed = cooldowns.get(userId) || 0;
+
+      if (now - lastUsed < COOLDOWN_MS) {
+        const remaining = Math.ceil((COOLDOWN_MS - (now - lastUsed)) / 1000);
+        return await ctx.reply(`⏳ Please wait ${remaining}s before scanning another token.`);
+      }
+
+      cooldowns.set(userId, now);
+
+      const randomLoading = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
+      await ctx.replyWithHTML(randomLoading);
+
+      try {
+        const result = await analyzeFull(text);
+        const report = formatReport(result, text);
+        await ctx.replyWithHTML(report);
+      } catch (err) {
+        console.error('Error in text handler:', err);
+        await ctx.replyWithHTML(
+          `😕 Something went wrong while scanning that token.\n\n` +
+          `This can happen if:\n` +
+          `• The token is brand new and has no data yet\n` +
+          `• The contract address is incorrect\n` +
+          `• Our data provider is temporarily slow\n\n` +
+          `Please try again in a moment.`
+        );
+      }
+    });
 
     bot.catch((err) => console.error('RugRadar Bot Error:', err));
 

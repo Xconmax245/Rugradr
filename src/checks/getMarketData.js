@@ -36,6 +36,38 @@ module.exports = async (address) => {
     const pairs = response.data.pairs;
 
     if (!pairs || pairs.length === 0) {
+      // Fallback to pump.fun API for bonding curve tokens
+      try {
+        console.log('[getMarketData] No DexScreener pairs, trying pump.fun fallback...');
+        const pumpResponse = await axios.get(
+          `https://frontend-api.pump.fun/coins/${address}`,
+          { timeout: 8000 }
+        );
+        const coin = pumpResponse.data;
+        if (coin && coin.usd_market_cap) {
+          return {
+            priceUsd: coin.usd_market_cap / (coin.total_supply / 1e6) || null,
+            marketCap: coin.usd_market_cap || null,
+            fdv: coin.usd_market_cap || null,
+            volume1h: null,
+            volume24h: null,
+            liquidityUsd: coin.virtual_sol_reserves ? coin.virtual_sol_reserves * 0.000000001 : null,
+            priceChange1h: null,
+            priceChange24h: null,
+            ath: null,
+            pairAddress: null,
+            dexId: 'pump-fun',
+            bondingStatus: coin.complete ? '✅ Graduated to DEX' : '🟡 Still on pump.fun bonding curve',
+            links: {
+              dexscreener: `https://dexscreener.com/solana/${address}`,
+              pumpfun: `https://pump.fun/${address}`,
+              solscan: `https://solscan.io/token/${address}`
+            }
+          };
+        }
+      } catch (pumpErr) {
+        console.log('[getMarketData] pump.fun fallback also failed:', pumpErr.message);
+      }
       return emptyResult;
     }
 

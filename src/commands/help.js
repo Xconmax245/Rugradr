@@ -1,26 +1,29 @@
 module.exports = (bot) => {
   bot.command('help', async (ctx) => {
     try {
-      const message = `🛟 RugRadar Help
-──────────────────
-📋 Commands:
+      const message = `🛟 <b>RugRadar Help</b>
+━━━━━━━━━━━━━━━━━━━━
 
-/check [address] — Scan a token for rug pull risk
+<b>How to use:</b>
+Just paste any Solana contract address.
+No slash commands needed.
+
+<b>What you get back:</b>
+🎯 A risk score from 0–100
+🔬 6 security checks explained in plain English
+🍯 Honeypot detection — can you actually sell?
+👨💻 Deployer history — has this dev rugged before?
+📊 Live market data — price, liquidity, volume
+💭 Plain English verdict from your rug-aware friend
+🧭 What you should actually do next
+
+<b>Commands:</b>
 /guide — Learn what each check means
+/help — This message
 /start — Back to the beginning
 
-──────────────────
-💡 How to get a contract address:
-
-1. Find the token on pump.fun, Dexscreener, or Telegram
-2. Copy the long string of letters and numbers (the contract address)
-3. Paste it after /check
-
-Example:
-<code>/check EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v</code>
-
-──────────────────
-⚠️ RugRadar is a tool to help you research — not a guarantee. Always do your own research.`;
+━━━━━━━━━━━━━━━━━━━━
+⚠️ RugRadar is a research tool. Not financial advice. Always DYOR.`;
 
       await ctx.replyWithHTML(message);
     } catch (err) {

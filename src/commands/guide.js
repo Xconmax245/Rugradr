@@ -45,6 +45,20 @@ How long has this token existed?
 ❌ <b>Under 1 hour old</b> = extremely high risk, almost no history.
 
 ──────────────────
+
+🍯 <b>Honeypot Check</b>
+Can you actually sell this token after buying?
+✅ <b>Not a honeypot</b> = you can sell freely
+❌ <b>Honeypot detected</b> = you may be unable to sell — avoid!
+
+──────────────────
+
+👨💻 <b>Deployer History</b>
+Has this developer rugged people before?
+✅ <b>Clean history</b> = first token or no rugs found
+❌ <b>Serial rugger</b> = this dev has done this before
+
+──────────────────
 💡 Tip: No single check tells the whole story. Look at the full picture.`;
 
       await ctx.replyWithHTML(message);
