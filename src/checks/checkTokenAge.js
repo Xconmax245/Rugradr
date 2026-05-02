@@ -25,7 +25,7 @@ module.exports = async (address) => {
 
     const signatures = response.data.result;
     if (!signatures || signatures.length === 0) {
-      return { createdAt: null, ageMs: 0, ageString: "Unknown", scoreImpact: -30 };
+      return { createdAt: null, ageMs: 0, ageString: "Unknown", scoreImpact: -30, isEstablished: false };
     }
 
     const oldestSignature = signatures[signatures.length - 1];
@@ -33,25 +33,29 @@ module.exports = async (address) => {
     const ageMs = Date.now() - blockTime * 1000;
     const ageString = getAgeString(ageMs);
 
+    // If we hit exactly 1000 sigs and they are all very recent, it's an established high-volume token
+    const isEstablished = signatures.length === 1000 && ageMs < (1000 * 60 * 60 * 2); // Under 2 hours for 1000 txs
+
     let scoreImpact = 0;
-    if (ageMs < AGE_THRESHOLDS.ONE_HOUR_MS) {
+    if (isEstablished) {
+      scoreImpact = 0; // Don't penalize age for established tokens
+    } else if (ageMs < AGE_THRESHOLDS.ONE_HOUR_MS) {
       scoreImpact = -30;
     } else if (ageMs < AGE_THRESHOLDS.ONE_DAY_MS) {
       scoreImpact = -15;
     } else if (ageMs < AGE_THRESHOLDS.SEVEN_DAYS_MS) {
       scoreImpact = -5;
-    } else {
-      scoreImpact = 0;
     }
 
     return {
       createdAt: blockTime,
       ageMs,
-      ageString,
-      scoreImpact
+      ageString: isEstablished ? "Established (High Volume)" : ageString,
+      scoreImpact,
+      isEstablished
     };
   } catch (err) {
     console.error('[checkTokenAge] Error:', err.message);
-    return { createdAt: null, ageMs: 0, ageString: "Unknown", scoreImpact: -30 };
+    return { createdAt: null, ageMs: 0, ageString: "Unknown", scoreImpact: -30, isEstablished: false };
   }
 };

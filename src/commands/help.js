@@ -1,38 +1,26 @@
 module.exports = (bot) => {
   bot.command('help', async (ctx) => {
     try {
-      const message = `📖 <b>How RugRadar Works</b>
+      const message = `🛟 RugRadar Help
+──────────────────
+📋 Commands:
 
-Send a Solana token contract address using:
-/check [contract address]
+/check [address] — Scan a token for rug pull risk
+/guide — Learn what each check means
+/start — Back to the beginning
 
-<b>Risk Score (0–100):</b>
-🟢 75–100 → Low Risk
-🟡 50–74 → Moderate Risk
-🔴 25–49 → High Risk
-☠️ 0–24 → Extremely High Risk
+──────────────────
+💡 How to get a contract address:
 
-<b>What each check means:</b>
+1. Find the token on pump.fun, Dexscreener, or Telegram
+2. Copy the long string of letters and numbers (the contract address)
+3. Paste it after /check
 
-🔑 <b>Mint Authority</b>
-If active, the dev can mint unlimited tokens and dump on you.
+Example:
+<code>/check EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v</code>
 
-🧊 <b>Freeze Authority</b>
-If active, the dev can freeze your wallet and stop you from selling.
-
-👥 <b>Holder Concentration</b>
-If the top 10 wallets hold most of the supply, one sell can crash the price.
-
-💧 <b>Liquidity</b>
-Low liquidity means you may not be able to sell when you want to.
-
-👨💻 <b>Dev Wallet</b>
-If the deployer is already selling, that's a major red flag.
-
-📅 <b>Token Age</b>
-Very new tokens have no track record and are highest risk.
-
-⚠️ <i>RugRadar is a tool to assist your research, not replace it.</i>`;
+──────────────────
+⚠️ RugRadar is a tool to help you research — not a guarantee. Always do your own research.`;
 
       await ctx.replyWithHTML(message);
     } catch (err) {

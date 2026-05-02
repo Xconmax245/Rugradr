@@ -1,28 +1,23 @@
 module.exports = (bot) => {
   bot.command('start', async (ctx) => {
     try {
-      const message = `👋 Welcome to RugRadar!
+      const message = `👋 Hey! Welcome to RugRadar.
 
-I help you spot potential rug pulls on Solana before you ape in.
+I scan Solana tokens and tell you how risky they are — before you buy.
 
-Simply send me a Solana token contract address and I'll analyze it instantly.
+Just send me a token's contract address and I'll check it for signs of a rug pull in seconds.
 
-🔍 <b>What I check:</b>
-• Mint authority status
-• Freeze authority status
-• Holder concentration
-• Liquidity depth
-• Dev wallet activity
-• Token age
+──────────────────
+🟢 Safe-looking token? Go ahead.
+🔴 Sketchy token? I'll warn you.
+☠️ Obvious rug? I'll scream it.
+──────────────────
 
-<b>Commands:</b>
-/check [address] — Analyze a token
-/help — How to use RugRadar
+To analyze a token, use:
+👉 /check [paste contract address here]
 
-<b>Example:</b>
-<code>/check EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v</code>
-
-⚠️ <i>Not financial advice. Always DYOR.</i>`;
+New to this? Type /guide to learn what all the checks mean.
+Need help? Type /help`;
 
       await ctx.replyWithHTML(message);
     } catch (err) {

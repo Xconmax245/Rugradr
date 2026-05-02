@@ -23,14 +23,25 @@ module.exports = (bot) => {
       const solanaRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 
       if (!address) {
-        return await ctx.replyWithHTML(`❌ Please provide a token address.\nExample: <code>/check EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v</code>`);
+        return await ctx.replyWithHTML(`👇 To scan a token, send me its contract address like this:
+
+<code>/check EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v</code>
+
+You can find contract addresses on Dexscreener, pump.fun, or in the token's Telegram group.`);
       }
 
       if (!solanaRegex.test(address)) {
-        return await ctx.replyWithHTML(`❌ That doesn't look like a valid Solana address.\nMake sure you're copying the contract address, not the token name.`);
+        return await ctx.replyWithHTML(`❌ That doesn't look like a valid Solana contract address.
+
+A Solana address looks like this:
+<code>EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v</code>
+
+Make sure you're copying the contract address — not the token name or ticker symbol.`);
       }
 
-      await ctx.replyWithHTML(`🔍 Analyzing contract...\n<code>${address}</code>\nThis may take a few seconds.`);
+      await ctx.replyWithHTML(`🔍 Scanning token...
+⏳ Pulling market data + running 6 security checks.
+Takes about 5–10 seconds.`);
 
       const result = await analyzeToken(address);
       const report = formatReport(result, address);
@@ -38,7 +49,14 @@ module.exports = (bot) => {
       await ctx.replyWithHTML(report);
     } catch (err) {
       console.error('Error in /check command:', err);
-      await ctx.reply('⚠️ Something went wrong. Please try again.');
+      await ctx.replyWithHTML(`😕 Something went wrong while scanning that token.
+
+This can happen if:
+• The token is brand new and has no data yet
+• The contract address is incorrect
+• Our data provider is temporarily slow
+
+Please try again in a moment.`);
     }
   });
 };
