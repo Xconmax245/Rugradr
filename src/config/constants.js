@@ -1,0 +1,23 @@
+module.exports = {
+  COOLDOWN_MS: 15000,
+  SCORE_THRESHOLDS: {
+    LOW_RISK: 75,
+    MODERATE_RISK: 50,
+    HIGH_RISK: 25
+  },
+  AGE_THRESHOLDS: {
+    ONE_HOUR_MS: 60 * 60 * 1000,
+    ONE_DAY_MS: 24 * 60 * 60 * 1000,
+    SEVEN_DAYS_MS: 7 * 24 * 60 * 60 * 1000
+  },
+  HOLDER_THRESHOLDS: {
+    VERY_HIGH: 80,
+    HIGH: 50,
+    MODERATE: 30
+  },
+  LIQUIDITY_THRESHOLDS: {
+    LOW: 10000,
+    MODERATE: 50000,
+    HIGH: 200000
+  }
+};
