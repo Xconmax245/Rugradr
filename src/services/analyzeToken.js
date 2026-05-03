@@ -144,4 +144,4 @@ async function analyzeFull(address) {
   }
 }
 
-module.exports = { analyzeFull };
+module.exports = analyzeFull;

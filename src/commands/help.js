@@ -4,9 +4,22 @@ module.exports = (bot) => {
       const message = `🛟 <b>RugRadar Help</b>
 ━━━━━━━━━━━━━━━━━━━━
 
-<b>How to use:</b>
-Just paste any Solana contract address.
-No slash commands needed.
+<b>How to scan a token:</b>
+
+Option 1 — Paste the CA:
+<code>EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v</code>
+
+Option 2 — Type the ticker:
+<code>SOL</code>
+<code>BONK</code>
+<code>WIF</code>
+
+Option 3 — Type the name:
+<code>dogwifhat</code>
+<code>popcat</code>
+
+If multiple tokens match your search,
+I'll show you a list to pick from.
 
 <b>What you get back:</b>
 🎯 A risk score from 0–100

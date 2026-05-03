@@ -3,6 +3,10 @@ module.exports = (bot) => {
     try {
       const message = `📖 What does RugRadar actually check?
 ──────────────────
+💡 You can search by name OR paste a CA.
+Just type "SOL", "BONK", "dogwifhat" — or paste a contract address directly.
+Both work exactly the same way.
+──────────────────
 
 🔑 <b>Mint Authority</b>
 Can the developer print more tokens out of thin air?

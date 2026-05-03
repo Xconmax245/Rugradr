@@ -14,8 +14,12 @@ Just paste any contract address and I'll tell you:
 📊 What do the numbers actually look like?
 ━━━━━━━━━━━━━━━━━━━━
 
-No commands. No learning curve.
-Just paste the CA. That's it.
+You can send me:
+• A contract address (CA) — paste it directly
+• A ticker symbol — like SOL, BONK, WIF
+• A token name — like "dogwifhat" or "popcat"
+
+No commands needed. Just type or paste.
 
 New here? Type /guide — I'll explain everything in plain English.`;
 

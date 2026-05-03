@@ -1,4 +1,4 @@
-const { analyzeFull } = require('../services/analyzeToken');
+const analyzeFull = require('../services/analyzeToken');
 const formatReport = require('../utils/formatReport');
 const { COOLDOWN_MS } = require('../config/constants');
 
