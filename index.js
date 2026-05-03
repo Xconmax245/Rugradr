@@ -61,6 +61,12 @@ async function startBot() {
     checkCommand(bot, cooldowns);
     guideCommand(bot);
 
+    // Simple ping for diagnostics
+    bot.command('ping', (ctx) => {
+      console.log(`[DIAGNOSTIC] Ping received from @${ctx.from.username || 'unknown'}`);
+      ctx.reply('pong! 🏓 Bot is alive.');
+    });
+
     // Rotating loading messages
     const loadingMessages = [
       "🕵️ Sniffing the blockchain...",
@@ -83,6 +89,7 @@ async function startBot() {
     // Direct CA Paste handler
     bot.on('text', async (ctx) => {
       const text = ctx.message.text.trim();
+      console.log(`[INCOMING] Text received: "${text}" from @${ctx.from.username || 'unknown'}`);
       
       // Ignore messages that start with /
       if (text.startsWith('/')) return;
