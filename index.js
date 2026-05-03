@@ -134,21 +134,21 @@ async function startBot() {
     console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log('Starting polling...');
     
-    bot.launch().catch((err) => {
-      if (err.response?.error_code === 409) {
-        console.error('⚠️ [CONFLICT] Another instance of the bot is already running.');
-        console.error('👉 If you are running locally, stop that process before deploying.');
-        console.error('👉 If you just deployed, wait 30s for the old instance to die.');
-      } else {
-        throw err;
-      }
-    });
+    await bot.launch();
   } catch (err) {
-    console.error('❌ Startup Error:', err.message);
-    if (err.response?.status === 401) {
-      console.error('👉 Tip: Your token is invalid. Double-check for extra characters.');
-    } else if (err.code === 'ECONNABORTED' || err.code === 'ETIMEDOUT') {
-      console.error('👉 Tip: Connection timed out. Check your internet or firewall.');
+    if (err.response?.error_code === 409) {
+      console.error('⚠️ [CONFLICT] Another instance of the bot is already running.');
+      console.error('👉 If you are running locally, stop that process before deploying.');
+      console.error('👉 If you just deployed, wait 30s for the old instance to die.');
+      process.exit(1); // Exit so Railway knows it failed and can restart
+    } else {
+      console.error('❌ Startup Error:', err.message);
+      if (err.response?.status === 401) {
+        console.error('👉 Tip: Your token is invalid. Double-check for extra characters.');
+      } else if (err.code === 'ECONNABORTED' || err.code === 'ETIMEDOUT') {
+        console.error('👉 Tip: Connection timed out. Check your internet or firewall.');
+      }
+      process.exit(1);
     }
   }
 }
