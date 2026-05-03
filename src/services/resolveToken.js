@@ -22,54 +22,64 @@ module.exports = async (input) => {
 
   try {
     // Step 1: Try Jupiter verified list first (exact symbol match)
-    const tokens = await getJupiterTokenList()
-    const exactMatches = tokens.filter(t =>
-      t.symbol?.toLowerCase() === query ||
-      t.name?.toLowerCase() === query
-    )
+    let tokens = []
+    try {
+      tokens = await getJupiterTokenList()
+    } catch (err) {
+      console.error('[resolveToken] Jupiter fetch failed:', err.message)
+      // Continue to DexScreener if Jupiter fails
+    }
 
-    if (exactMatches.length === 1) {
-      // Single exact match — return directly
-      return {
-        type: 'single',
-        token: {
-          address: exactMatches[0].address,
-          name: exactMatches[0].name,
-          symbol: exactMatches[0].symbol,
+    if (tokens && tokens.length > 0) {
+      const exactMatches = tokens.filter(t =>
+        t.symbol?.toLowerCase() === query ||
+        t.name?.toLowerCase() === query
+      )
+
+      if (exactMatches.length === 1) {
+        // Single exact match — return directly
+        return {
+          type: 'single',
+          token: {
+            address: exactMatches[0].address,
+            name: exactMatches[0].name,
+            symbol: exactMatches[0].symbol,
+          }
+        }
+      }
+
+      if (exactMatches.length > 1) {
+        // Multiple exact matches — return top 5 by tag priority
+        return {
+          type: 'multiple',
+          tokens: exactMatches.slice(0, 5).map(t => ({
+            address: t.address,
+            name: t.name,
+            symbol: t.symbol,
+          }))
+        }
+      }
+
+      // Step 2: Partial match on Jupiter list
+      const partialMatches = tokens.filter(t =>
+        t.symbol?.toLowerCase().includes(query) ||
+        t.name?.toLowerCase().includes(query)
+      )
+
+      if (partialMatches.length > 0) {
+        return {
+          type: 'multiple',
+          tokens: partialMatches.slice(0, 5).map(t => ({
+            address: t.address,
+            name: t.name,
+            symbol: t.symbol,
+          }))
         }
       }
     }
 
-    if (exactMatches.length > 1) {
-      // Multiple exact matches — return top 5 by tag priority
-      return {
-        type: 'multiple',
-        tokens: exactMatches.slice(0, 5).map(t => ({
-          address: t.address,
-          name: t.name,
-          symbol: t.symbol,
-        }))
-      }
-    }
-
-    // Step 2: Partial match on Jupiter list
-    const partialMatches = tokens.filter(t =>
-      t.symbol?.toLowerCase().includes(query) ||
-      t.name?.toLowerCase().includes(query)
-    )
-
-    if (partialMatches.length > 0) {
-      return {
-        type: 'multiple',
-        tokens: partialMatches.slice(0, 5).map(t => ({
-          address: t.address,
-          name: t.name,
-          symbol: t.symbol,
-        }))
-      }
-    }
-
     // Step 3: Fallback to DexScreener search
+    console.log('[resolveToken] Falling back to DexScreener for:', query)
     const dexResponse = await axios.get(
       `https://api.dexscreener.com/latest/dex/search?q=${encodeURIComponent(input)}`,
       { timeout: 10000 }
@@ -78,6 +88,7 @@ module.exports = async (input) => {
     const pairs = dexResponse.data.pairs?.filter(p => p.chainId === 'solana') || []
 
     if (pairs.length === 0) {
+      console.log('[resolveToken] No matches found on DexScreener')
       return { type: 'notfound' }
     }
 
@@ -106,7 +117,7 @@ module.exports = async (input) => {
     return { type: 'multiple', tokens: unique }
 
   } catch (err) {
-    console.error('[resolveToken] Error:', err.message)
+    console.error('[resolveToken] Critical Error:', err.message)
     return { type: 'error' }
   }
 }
